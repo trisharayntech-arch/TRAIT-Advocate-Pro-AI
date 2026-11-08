@@ -11,14 +11,21 @@ import {
   Search,
   Bell,
   Settings,
-  Scale
+  Scale,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
   unreadCount?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ unreadCount = 0 }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  unreadCount = 0,
+  isOpen = false,
+  onClose,
+}) => {
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Cases', path: '/cases', icon: Briefcase },
@@ -28,76 +35,136 @@ export const Sidebar: React.FC<SidebarProps> = ({ unreadCount = 0 }) => {
     { name: 'Legal Drafting', path: '/drafting', icon: PenTool },
     { name: 'Legal Research', path: '/research', icon: BookOpen },
     { name: 'Global Search', path: '/search', icon: Search },
-    { name: 'Notifications', path: '/notifications', icon: Bell, count: unreadCount },
+    {
+      name: 'Notifications',
+      path: '/notifications',
+      icon: Bell,
+      count: unreadCount,
+    },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
   return (
-    <aside className="w-64 bg-[#101A2C] text-white flex flex-col h-screen fixed left-0 top-0 z-30 select-none shadow-xl border-r border-[#1E2E4A]">
-      {/* Brand Header */}
-      <div className="h-16 px-6 flex items-center justify-between border-b border-[#1E2E4A]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-            <Scale className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <div className="text-sm font-black tracking-wider uppercase flex items-center gap-1.5 text-white">
-              TRAIT <span className="text-[#2563EB] text-xs font-semibold px-1.5 py-0.5 rounded bg-blue-900/40 border border-blue-700/50">PRO</span>
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+          isOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed left-0 top-0 z-50
+          flex h-[100dvh] w-72 max-w-[85vw] flex-col
+          select-none overflow-hidden
+          border-r border-[#53602F]
+          bg-[#34452F] text-[#FFF8EC]
+          shadow-2xl
+          transition-transform duration-300 ease-in-out
+          md:w-64 md:translate-x-0
+          ${
+            isOpen
+              ? 'translate-x-0'
+              : '-translate-x-full md:translate-x-0'
+          }
+        `}
+      >
+        {/* Brand Header */}
+        <div className="flex h-16 min-h-16 items-center justify-between border-b border-white/10 px-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAA34B] text-[#34452F] shadow-md">
+              <Scale className="h-5 w-5" />
             </div>
-            <div className="text-[10px] text-[#8290A5] tracking-tight font-medium">ADVOCATE LEGAL AI</div>
-          </div>
-        </div>
-      </div>
 
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        <div className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-[#8290A5] uppercase">
-          Workspace
-        </div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              className={({ isActive }) =>
-                `flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-[#2563EB] text-white shadow-md shadow-blue-600/30 font-semibold'
-                    : 'text-[#CBD5E1] hover:bg-[#18263E] hover:text-white'
-                }`
-              }
-            >
-              <div className="flex items-center gap-3">
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{item.name}</span>
+            <div>
+              <div className="flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-[#FFF8EC]">
+                TRAIT
+                <span className="rounded bg-[#EAA34B] px-1.5 py-0.5 text-xs font-bold text-[#34452F]">
+                  PRO
+                </span>
               </div>
-              {item.badge && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                  {item.badge}
-                </span>
-              )}
-              {Boolean(item.count && item.count > 0) && (
-                <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-red-500 text-white min-w-5 text-center">
-                  {item.count}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
-      </div>
 
-      {/* Bottom Legal Disclaimer Pill */}
-      <div className="p-4 border-t border-[#1E2E4A]">
-        <div className="bg-[#18263E] rounded-lg p-3 text-[11px] text-[#8290A5] border border-[#233554]">
-          <div className="flex items-center gap-1.5 text-blue-400 font-semibold mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-            Jurisprudence Engine
+              <div className="text-[10px] font-medium tracking-tight text-[#D7DCCB]">
+                ADVOCATE LEGAL AI
+              </div>
+            </div>
           </div>
-          Compliant with Indian Statutes & Court Rules. Review drafts prior to filing.
+
+          {/* Mobile close button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#FFF8EC] transition-colors hover:bg-white/10 md:hidden"
+            aria-label="Close navigation menu"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-5">
+          <div className="px-3 pb-3 text-[11px] font-semibold uppercase tracking-wider text-[#D7DCCB]/70">
+            Workspace
+          </div>
+
+          {navItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === '/'}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex min-h-11 items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#EAA34B] font-bold text-[#34452F] shadow-md'
+                      : 'text-[#F4EEDF] hover:bg-[#476B3F] hover:text-white'
+                  }`
+                }
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  <span className="truncate">{item.name}</span>
+                </div>
+
+                {item.badge && (
+                  <span className="ml-2 rounded border border-[#EAA34B]/40 bg-[#E9824A]/20 px-1.5 py-0.5 text-[10px] font-bold text-[#FFD69B]">
+                    {item.badge}
+                  </span>
+                )}
+
+                {Boolean(item.count && item.count > 0) && (
+                  <span className="ml-2 min-w-5 rounded-full bg-[#D94F1E] px-1.5 py-0.5 text-center text-[11px] font-bold text-white">
+                    {item.count}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        {/* Bottom Legal Disclaimer */}
+        <div className="border-t border-white/10 p-4">
+          <div className="rounded-xl border border-[#53602F] bg-[#263A2B] p-3 text-[11px] text-[#D7DCCB]">
+            <div className="mb-1 flex items-center gap-1.5 font-semibold text-[#EAA34B]">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#EAA34B]" />
+              Jurisprudence Engine
+            </div>
+
+            Compliant with Indian Statutes & Court Rules. Review drafts prior to filing.
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
+
+export default Sidebar;

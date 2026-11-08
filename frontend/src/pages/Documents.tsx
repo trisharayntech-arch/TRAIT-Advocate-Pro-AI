@@ -5,9 +5,8 @@ import {
   Download,
   Trash2,
   Eye,
-  FileCheck,
   AlertCircle,
-  Database
+  Database,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { DocumentItem, Case, Client } from '../types';
@@ -34,9 +33,11 @@ export const Documents: React.FC = () => {
         api.getCases(),
         api.getClients(),
       ]);
+
       setDocuments(docsData);
       setCases(casesData);
       setClients(clientsData);
+      setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load documents');
     } finally {
@@ -52,10 +53,13 @@ export const Documents: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const ext = file.name.split('.').pop()?.toLowerCase();
+
       if (!['pdf', 'docx', 'txt'].includes(ext || '')) {
         alert('Supported document formats: PDF, DOCX, and TXT.');
+        e.target.value = '';
         return;
       }
+
       setSelectedFile(file);
     }
   };
@@ -66,12 +70,18 @@ export const Documents: React.FC = () => {
 
     try {
       setUploading(true);
-      await api.uploadDocument(selectedFile, selectedCaseId || undefined, selectedClientId || undefined);
+
+      await api.uploadDocument(
+        selectedFile,
+        selectedCaseId || undefined,
+        selectedClientId || undefined
+      );
+
       setIsUploadModalOpen(false);
       setSelectedFile(null);
       setSelectedCaseId('');
       setSelectedClientId('');
-      loadDocuments();
+      await loadDocuments();
     } catch (err: any) {
       alert(err.message || 'Upload failed');
     } finally {
@@ -83,7 +93,7 @@ export const Documents: React.FC = () => {
     if (window.confirm(`Delete document "${name}" and its index?`)) {
       try {
         await api.deleteDocument(id);
-        loadDocuments();
+        await loadDocuments();
       } catch (err: any) {
         alert(err.message || 'Failed to delete document');
       }
@@ -101,43 +111,50 @@ export const Documents: React.FC = () => {
 
   return (
     <div className="space-y-6">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#172033] tracking-tight flex items-center gap-2.5">
-            <FileText className="w-6 h-6 text-[#2563EB]" />
+          <h1 className="text-2xl font-black text-[#34452F] tracking-tight flex items-center gap-2.5">
+            <FileText className="w-6 h-6 text-[#EAA34B]" />
             Document Vault & RAG Index
           </h1>
-          <p className="text-xs text-[#8290A5] mt-1 font-medium">
+
+          <p className="text-xs text-[#7D806B] mt-1 font-medium">
             Upload petitions, affidavits, contracts, and court orders for neural text extraction and RAG search.
           </p>
         </div>
 
         <button
           onClick={() => setIsUploadModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#476B3F] hover:bg-[#34452F] text-white text-xs font-bold rounded-xl shadow-md shadow-[#476B3F]/20 transition-all cursor-pointer"
         >
           <UploadCloud className="w-4 h-4" />
           Upload & Index Document
         </button>
       </div>
 
+      {/* Error */}
       {error && (
-        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+        <div className="p-3.5 rounded-xl bg-[#FCEAE3] border border-[#E9B9A7] text-xs text-[#BD4118] flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Document Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-[#FFFCF5] rounded-2xl border border-[#E9DCC6] shadow-sm overflow-hidden">
+
         {loading ? (
-          <div className="p-12 text-center text-xs text-[#8290A5]">Loading document repository...</div>
+          <div className="p-12 text-center text-xs text-[#7D806B]">
+            Loading document repository...
+          </div>
         ) : documents.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
+
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-200 text-[11px] font-bold text-[#8290A5] uppercase tracking-wider">
+                <tr className="bg-[#F8EFDF] border-b border-[#E9DCC6] text-[11px] font-bold text-[#53602F] uppercase tracking-wider">
                   <th className="py-3.5 px-6">File Name</th>
                   <th className="py-3.5 px-6">Size</th>
                   <th className="py-3.5 px-6">RAG Chunks</th>
@@ -145,74 +162,95 @@ export const Documents: React.FC = () => {
                   <th className="py-3.5 px-6 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+
+              <tbody className="divide-y divide-[#E9DCC6] text-xs">
                 {documents.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-4 px-6 font-bold text-[#172033] flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div>{d.original_name}</div>
-                        <div className="text-[10px] text-[#8290A5] font-normal">
-                          {d.mime_type || 'Document'}
+                  <tr
+                    key={d.id}
+                    className="hover:bg-[#F8EFDF]/60 transition-colors"
+                  >
+                    <td className="py-4 px-6 font-bold text-[#34452F]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#EAA34B]/15 text-[#D18A32] flex items-center justify-center shrink-0">
+                          <FileText className="w-4 h-4" />
+                        </div>
+
+                        <div>
+                          <div>{d.original_name}</div>
+                          <div className="text-[10px] text-[#7D806B] font-normal">
+                            {d.mime_type || 'Document'}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-[#172033] font-medium">
+
+                    <td className="py-4 px-6 text-[#53602F] font-medium">
                       {(d.file_size / 1024).toFixed(1)} KB
                     </td>
+
                     <td className="py-4 px-6">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#EAA34B]/15 text-[#9A641F] border border-[#EAA34B]/30">
                         <Database className="w-3 h-3" />
                         {d.chunk_count} Chunks
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-[#8290A5]">
+
+                    <td className="py-4 px-6 text-[#7D806B]">
                       {new Date(d.created_at).toLocaleDateString()}
                     </td>
+
                     <td className="py-4 px-6 text-right">
                       <div className="inline-flex items-center gap-2">
+
                         <button
                           onClick={() => viewExtractedText(d.id)}
-                          className="p-1.5 text-slate-500 hover:text-[#2563EB] hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#7D806B] hover:text-[#476B3F] hover:bg-[#476B3F]/10 rounded-lg transition-colors cursor-pointer"
                           title="View Extracted Text"
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
+
                         <a
                           href={api.getDocumentDownloadUrl(d.id)}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#7D806B] hover:text-[#476B3F] hover:bg-[#476B3F]/10 rounded-lg transition-colors cursor-pointer"
                           title="Download Original"
                         >
                           <Download className="w-3.5 h-3.5" />
                         </a>
+
                         <button
                           onClick={() => handleDelete(d.id, d.original_name)}
-                          className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-[#7D806B] hover:text-[#D94F1E] hover:bg-[#D94F1E]/10 rounded-lg transition-colors cursor-pointer"
                           title="Delete Document"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
+
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
         ) : (
           <div className="text-center py-16">
-            <UploadCloud className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-            <h3 className="text-sm font-bold text-[#172033]">No documents uploaded</h3>
-            <p className="text-xs text-[#8290A5] mt-1 max-w-xs mx-auto">
+            <UploadCloud className="w-10 h-10 text-[#D9C9AD] mx-auto mb-2" />
+
+            <h3 className="text-sm font-bold text-[#34452F]">
+              No documents uploaded
+            </h3>
+
+            <p className="text-xs text-[#7D806B] mt-1 max-w-xs mx-auto">
               Upload case briefs, judgments, and legal deeds to enable contextual AI inquiries.
             </p>
+
             <button
               onClick={() => setIsUploadModalOpen(true)}
-              className="mt-4 px-4 py-2 bg-[#2563EB] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+              className="mt-4 px-4 py-2 bg-[#476B3F] hover:bg-[#34452F] text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
             >
               + Upload Document
             </button>
@@ -227,7 +265,9 @@ export const Documents: React.FC = () => {
         title="Upload Legal Document for Neural Indexing"
       >
         <form onSubmit={handleUploadSubmit} className="space-y-4">
-          <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-[#2563EB] transition-colors bg-[#F5F7FB]">
+
+          <div className="border-2 border-dashed border-[#D9C9AD] rounded-2xl p-6 text-center hover:border-[#EAA34B] transition-colors bg-[#FFF8EC]">
+
             <input
               type="file"
               id="file-upload"
@@ -235,21 +275,27 @@ export const Documents: React.FC = () => {
               onChange={handleFileChange}
               className="hidden"
             />
+
             <label htmlFor="file-upload" className="cursor-pointer block">
-              <UploadCloud className="w-10 h-10 text-[#2563EB] mx-auto mb-2" />
+              <UploadCloud className="w-10 h-10 text-[#D18A32] mx-auto mb-2" />
+
               {selectedFile ? (
                 <div>
-                  <p className="text-xs font-bold text-[#172033]">{selectedFile.name}</p>
-                  <p className="text-[11px] text-[#8290A5] mt-0.5">
+                  <p className="text-xs font-bold text-[#34452F]">
+                    {selectedFile.name}
+                  </p>
+
+                  <p className="text-[11px] text-[#7D806B] mt-0.5">
                     {(selectedFile.size / 1024).toFixed(1)} KB • Click to choose another
                   </p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-xs font-bold text-[#172033]">
+                  <p className="text-xs font-bold text-[#34452F]">
                     Click to select PDF, DOCX, or TXT
                   </p>
-                  <p className="text-[11px] text-[#8290A5] mt-0.5">
+
+                  <p className="text-[11px] text-[#7D806B] mt-0.5">
                     PyMuPDF & python-docx will automatically extract and chunk paragraphs
                   </p>
                 </div>
@@ -258,14 +304,19 @@ export const Documents: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
             <div>
-              <label className="block text-xs font-semibold text-[#172033] mb-1.5">Link to Case (Optional)</label>
+              <label className="block text-xs font-semibold text-[#34452F] mb-1.5">
+                Link to Case (Optional)
+              </label>
+
               <select
                 value={selectedCaseId}
                 onChange={(e) => setSelectedCaseId(e.target.value)}
-                className="w-full bg-[#F5F7FB] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+                className="w-full bg-[#FFF8EC] border border-[#E9DCC6] rounded-xl px-3 py-2 text-xs text-[#34452F] focus:outline-none focus:ring-2 focus:ring-[#EAA34B]/30 focus:border-[#EAA34B]"
               >
                 <option value="">-- No Case Link --</option>
+
                 {cases.map((cs) => (
                   <option key={cs.id} value={cs.id}>
                     {cs.case_number} - {cs.title}
@@ -275,13 +326,17 @@ export const Documents: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#172033] mb-1.5">Link to Client (Optional)</label>
+              <label className="block text-xs font-semibold text-[#34452F] mb-1.5">
+                Link to Client (Optional)
+              </label>
+
               <select
                 value={selectedClientId}
                 onChange={(e) => setSelectedClientId(e.target.value)}
-                className="w-full bg-[#F5F7FB] border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]"
+                className="w-full bg-[#FFF8EC] border border-[#E9DCC6] rounded-xl px-3 py-2 text-xs text-[#34452F] focus:outline-none focus:ring-2 focus:ring-[#EAA34B]/30 focus:border-[#EAA34B]"
               >
                 <option value="">-- No Client Link --</option>
+
                 {clients.map((cl) => (
                   <option key={cl.id} value={cl.id}>
                     {cl.full_name}
@@ -289,28 +344,32 @@ export const Documents: React.FC = () => {
                 ))}
               </select>
             </div>
+
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-[#E9DCC6] flex items-center justify-end gap-3">
+
             <button
               type="button"
               onClick={() => setIsUploadModalOpen(false)}
-              className="px-4 py-2 text-xs font-bold text-[#8290A5] hover:text-[#172033] hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-[#7D806B] hover:text-[#34452F] hover:bg-[#F8EFDF] rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={!selectedFile || uploading}
-              className="px-5 py-2 text-xs font-bold text-white bg-[#2563EB] hover:bg-blue-700 rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-5 py-2 text-xs font-bold text-white bg-[#476B3F] hover:bg-[#34452F] rounded-xl shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
             >
               {uploading ? 'Extracting & Indexing...' : 'Upload & Process'}
             </button>
+
           </div>
         </form>
       </Modal>
 
-      {/* Extracted Text Preview Drawer / Modal */}
+      {/* Extracted Text Preview */}
       <Modal
         isOpen={Boolean(viewingDoc)}
         onClose={() => setViewingDoc(null)}
@@ -318,23 +377,33 @@ export const Documents: React.FC = () => {
         maxWidth="max-w-3xl"
       >
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-[#8290A5] pb-2 border-b border-slate-100">
-            <span>Size: {((viewingDoc?.file_size || 0) / 1024).toFixed(1)} KB</span>
-            <span className="font-semibold text-indigo-600">{viewingDoc?.chunk_count} RAG Chunks Generated</span>
+
+          <div className="flex items-center justify-between text-xs text-[#7D806B] pb-2 border-b border-[#E9DCC6]">
+            <span>
+              Size: {((viewingDoc?.file_size || 0) / 1024).toFixed(1)} KB
+            </span>
+
+            <span className="font-semibold text-[#9A641F]">
+              {viewingDoc?.chunk_count} RAG Chunks Generated
+            </span>
           </div>
-          <div className="bg-[#F5F7FB] border border-[#E2E8F0] rounded-xl p-4 max-h-[55vh] overflow-y-auto text-xs text-[#172033] whitespace-pre-wrap font-mono leading-relaxed">
+
+          <div className="bg-[#FFF8EC] border border-[#E9DCC6] rounded-xl p-4 max-h-[55vh] overflow-y-auto text-xs text-[#34452F] whitespace-pre-wrap font-mono leading-relaxed">
             {viewingDoc?.extracted_text || '[No text could be extracted from this document]'}
           </div>
+
           <div className="flex justify-end pt-2">
             <button
               onClick={() => setViewingDoc(null)}
-              className="px-4 py-2 text-xs font-bold text-[#2563EB] bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-white bg-[#476B3F] hover:bg-[#34452F] rounded-xl transition-colors cursor-pointer"
             >
               Close Viewer
             </button>
           </div>
+
         </div>
       </Modal>
+
     </div>
   );
 };

@@ -17,7 +17,7 @@ def get_ai_status() -> Dict[str, Any]:
         active_provider = "OpenAI (gpt-4o-mini)"
 
     return {
-        "gemini_configured": bool(settings.GEMINI_API_KEY),
+
         "openai_configured": bool(settings.OPENAI_API_KEY),
         "active_provider": active_provider,
         "mode": "live_ai" if is_ai_configured() else "rule_based_engine"
@@ -27,7 +27,11 @@ async def call_live_ai(prompt: str, system_instruction: str = "") -> Optional[st
     """Attempts live AI call via Gemini or OpenAI if configured."""
     if settings.GEMINI_API_KEY:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
+            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"
+            headers = {
+    "x-goog-api-key": settings.GEMINI_API_KEY,
+    "Content-Type": "application/json",
+}
             payload = {
                 "contents": [
                     {
@@ -38,7 +42,7 @@ async def call_live_ai(prompt: str, system_instruction: str = "") -> Optional[st
                 ]
             }
             async with httpx.AsyncClient(timeout=30.0) as client:
-                res = await client.post(url, json=payload)
+                res = await client.post(url, headers=headers, json=payload)
                 if res.status_code == 200:
                     data = res.json()
                     candidates = data.get("candidates", [])

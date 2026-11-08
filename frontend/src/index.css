@@ -1,40 +1,262 @@
 @import "tailwindcss";
 
+/* =========================================
+   TRAIT ADVOCATE PRO AI
+   FOREST GREEN + MARIGOLD DESIGN SYSTEM
+========================================= */
+
 @layer base {
   :root {
-    --navy: #101A2C;
-    --navy-light: #18263E;
-    --blue: #2563EB;
-    --blue-hover: #1D4ED8;
-    --bg-main: #F5F7FB;
-    --text-main: #172033;
-    --text-muted: #8290A5;
-    --card-bg: #FFFFFF;
-    --border-color: #E2E8F0;
+    /* Primary colours */
+    --navy: #53602F;
+    --navy-light: #476B3F;
+
+    --primary: #53602F;
+    --primary-hover: #3F4C25;
+
+    --blue: #D94F1E;
+    --blue-hover: #BD4118;
+
+    /* Accent colours */
+    --accent-orange: #D94F1E;
+    --accent-terracotta: #E9824A;
+    --accent-gold: #EAA34B;
+    --accent-yellow: #E8B85B;
+
+    /* Backgrounds */
+    --bg-main: #FFF8EC;
+    --bg-secondary: #F8EFDF;
+    --card-bg: #FFFCF5;
+
+    /* Text */
+    --text-main: #263522;
+    --text-muted: #7D806B;
+
+    /* Borders */
+    --border-color: #E9DCC6;
+
+    /* Status */
+    --success: #476B3F;
+    --warning: #EAA34B;
+    --danger: #C84632;
+
+    /* Layout */
+    --sidebar-width: 256px;
+    --topbar-height: 64px;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px rgba(52, 69, 47, 0.06);
+    --shadow-premium: 0 20px 60px rgba(52, 69, 47, 0.12);
+  }
+
+  /* Global reset */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    width: 100%;
+    min-height: 100%;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    width: 100%;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
+
+    background-color: var(--bg-main);
+    color: var(--text-main);
+
+    font-family:
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
+
+    font-size: 14px;
+    line-height: 1.5;
+
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    overflow-x: hidden;
+  }
+
+  /* Root application */
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: clip;
+  }
+
+  /* Images */
+  img,
+  video,
+  svg {
+    max-width: 100%;
+  }
+
+  img {
+    display: block;
+  }
+
+  /* Buttons */
+  button {
+    cursor: pointer;
+    font: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /* Form controls */
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: var(--text-main);
+    max-width: 100%;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #9B9B83;
+    opacity: 1;
+  }
+
+  /* Links */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--accent-gold);
+    color: var(--text-main);
+  }
+
+  /* Accessible focus */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--accent-gold);
+    outline-offset: 3px;
   }
 }
 
-/* Custom scrollbar */
+/* =========================================
+   SCROLLBAR
+========================================= */
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-secondary);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #8B925D;
+  border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--primary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8B925D var(--bg-secondary);
+}
+
+/* =========================================
+   PREMIUM INTERACTIONS
+========================================= */
+
+button,
+a,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* =========================================
+   RESPONSIVE FOUNDATION
+========================================= */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  :root {
+    --sidebar-width: 0px;
+    --topbar-height: 60px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
