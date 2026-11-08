@@ -1,5 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://commit-universities-landing-des.trycloudflare.com/api/v1';
 class ApiClient {
   private getToken(): string | null {
     return localStorage.getItem('advocate_pro_token');
