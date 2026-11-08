@@ -115,17 +115,35 @@ def export_docx(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user_flexible)
 ):
-    draft = db.query(Draft).filter(Draft.id == draft_id, Draft.user_id == current_user.id).first()
+    draft = db.query(Draft).filter(
+        Draft.id == draft_id,
+        Draft.user_id == current_user.id
+    ).first()
+
     if not draft:
         raise HTTPException(status_code=404, detail="Draft not found")
-    
-    stream = create_docx_file(draft.title, draft.content, draft.draft_type)
-    safe_filename = f"{draft.title.replace(' ', '_')}.docx"
-    
+
+    stream = create_docx_file(
+        draft.title,
+        draft.content,
+        draft.draft_type
+    )
+
+    # Generate an ASCII-safe filename to prevent HTTP header errors
+    safe_title = "".join(
+        char if char.isascii() and (char.isalnum() or char in ("-", "_"))
+        else "_"
+        for char in draft.title
+    ).strip("_")
+
+    safe_filename = f"{safe_title or 'legal_draft'}.docx"
+
     return StreamingResponse(
         stream,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": f"attachment; filename={safe_filename}"}
+        headers={
+            "Content-Disposition": f'attachment; filename="{safe_filename}"'
+        }
     )
 
 @router.delete("/{draft_id}", status_code=status.HTTP_204_NO_CONTENT)
