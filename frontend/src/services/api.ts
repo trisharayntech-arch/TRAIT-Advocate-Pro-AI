@@ -1,5 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://assists-explosion-moses-publisher.trycloudflare.com/api/v1';
-class ApiClient {
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://rat-grows-fuzzy-october.trycloudflare.com/api/v1';
+  class ApiClient {
   private getToken(): string | null {
     return localStorage.getItem('advocate_pro_token');
   }
