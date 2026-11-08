@@ -17,15 +17,23 @@ import { Search } from './pages/Search';
 import { Notifications } from './pages/Notifications';
 import { Settings } from './pages/Settings';
 
+```tsx
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#101A2C] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs font-bold text-white tracking-wider uppercase">Loading TRAIT Chamber...</p>
+      <div className="min-h-screen bg-[#FFF8EC] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#E9DCC6] border-t-[#476B3F] rounded-full animate-spin"></div>
+
+          <p className="text-xs font-bold text-[#34452F] tracking-[0.2em] uppercase">
+            Loading TRAIT Chamber...
+          </p>
+
+          <div className="w-32 h-1 rounded-full bg-[#E9DCC6] overflow-hidden">
+            <div className="h-full w-1/2 bg-[#EAA34B] rounded-full animate-pulse"></div>
+          </div>
         </div>
       </div>
     );
@@ -37,43 +45,4 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   return <>{children}</>;
 };
-
-export const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Authentication Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Protected Application Routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="cases" element={<Cases />} />
-            <Route path="clients" element={<Clients />} />
-            <Route path="documents" element={<Documents />} />
-            <Route path="assistant" element={<Assistant />} />
-            <Route path="drafting" element={<Drafting />} />
-            <Route path="research" element={<Research />} />
-            <Route path="search" element={<Search />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
-};
-
-export default App;
+```
