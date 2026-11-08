@@ -1,5 +1,6 @@
 const API_BASE_URL =
-  'https://rat-grows-fuzzy-october.trycloudflare.com/api/v1';
+  import.meta.env.VITE_API_URL ||
+  'https://trait-advocate-pro-ai.skyhost.tech/api/v1';
   class ApiClient {
   private getToken(): string | null {
     return localStorage.getItem('advocate_pro_token');
