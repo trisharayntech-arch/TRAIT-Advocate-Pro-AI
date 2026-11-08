@@ -1,5 +1,4 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
   'https://rat-grows-fuzzy-october.trycloudflare.com/api/v1';
   class ApiClient {
   private getToken(): string | null {
