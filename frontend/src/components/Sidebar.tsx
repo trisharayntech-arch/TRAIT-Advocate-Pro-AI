@@ -13,6 +13,7 @@ import {
   Settings,
   Scale,
   X,
+  CreditCard,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -41,12 +42,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Bell,
       count: unreadCount,
     },
+    { name: 'Pricing & Plans', path: '/pricing', icon: CreditCard, badge: 'NEW' },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
   return (
     <>
-      {/* Mobile backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isOpen
@@ -57,25 +58,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-hidden="true"
       />
 
-      {/* Sidebar */}
       <aside
-        className={`
-          fixed left-0 top-0 z-50
-          flex h-[100dvh] w-72 max-w-[85vw] flex-col
-          select-none overflow-hidden
-          border-r border-[#53602F]
-          bg-[#34452F] text-[#FFF8EC]
-          shadow-2xl
-          transition-transform duration-300 ease-in-out
-          md:w-64 md:translate-x-0
-          ${
-            isOpen
-              ? 'translate-x-0'
-              : '-translate-x-full md:translate-x-0'
-          }
-        `}
+        className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-72 max-w-[85vw] select-none flex-col overflow-hidden border-r border-[#53602F] bg-[#34452F] text-[#FFF8EC] shadow-2xl transition-transform duration-300 ease-in-out md:w-64 md:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
       >
-        {/* Brand Header */}
         <div className="flex h-16 min-h-16 items-center justify-between border-b border-white/10 px-5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAA34B] text-[#34452F] shadow-md">
@@ -96,7 +83,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* Mobile close button */}
           <button
             type="button"
             onClick={onClose}
@@ -107,7 +93,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-5">
           <div className="px-3 pb-3 text-[11px] font-semibold uppercase tracking-wider text-[#D7DCCB]/70">
             Workspace
@@ -151,7 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Bottom Legal Disclaimer */}
         <div className="border-t border-white/10 p-4">
           <div className="rounded-xl border border-[#53602F] bg-[#263A2B] p-3 text-[11px] text-[#D7DCCB]">
             <div className="mb-1 flex items-center gap-1.5 font-semibold text-[#EAA34B]">
